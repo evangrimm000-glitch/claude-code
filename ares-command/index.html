@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARES Command — interactive ops prototype</title>
+<style>
+  :root{
+    --ground:#EEF1F5; --grad:radial-gradient(1200px 600px at 80% -10%,#E7EEF0 0%,#EEF1F5 55%);
+    --card:#FFFFFF; --card-2:#FBFCFD; --ink:#16202C; --ink-2:#54606E; --ink-3:#8A94A1;
+    --line:#E2E6EC; --line-2:#EDF0F4;
+    --accent:#0E6E7D; --accent-2:#17A2B4; --accent-tint:#E3F0F1; --accent-ink:#0A525E;
+    --crit:#B5372B; --crit-tint:#FAE9E6; --warn:#B0730F; --warn-tint:#F8EFDA; --good:#2C7B58; --good-tint:#E2F1E9;
+    --radius:14px; --r-sm:10px;
+    --shadow:0 1px 2px rgba(18,28,40,.04),0 6px 18px rgba(18,28,40,.06);
+    --shadow-lg:0 2px 6px rgba(18,28,40,.06),0 18px 42px rgba(18,28,40,.10);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  :root[data-theme="dark"], .darktokens{
+    --ground:#0E1319; --grad:radial-gradient(1200px 600px at 80% -10%,#12303550 0%,#0E1319 55%);
+    --card:#161D26; --card-2:#131A22; --ink:#E8ECF1; --ink-2:#A6AFBC; --ink-3:#6B7683;
+    --line:#25303D; --line-2:#1D2630;
+    --accent:#2AA0B1; --accent-2:#37BACB; --accent-tint:#123037; --accent-ink:#7FD6E1;
+    --crit:#E37567; --crit-tint:#2E1B18; --warn:#E0A948; --warn-tint:#2C2413; --good:#5BBB8C; --good-tint:#152A20;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.4),0 20px 46px rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#0E1319; --grad:radial-gradient(1200px 600px at 80% -10%,#12303550 0%,#0E1319 55%);
+    --card:#161D26; --card-2:#131A22; --ink:#E8ECF1; --ink-2:#A6AFBC; --ink-3:#6B7683;
+    --line:#25303D; --line-2:#1D2630;
+    --accent:#2AA0B1; --accent-2:#37BACB; --accent-tint:#123037; --accent-ink:#7FD6E1;
+    --crit:#E37567; --crit-tint:#2E1B18; --warn:#E0A948; --warn-tint:#2C2413; --good:#5BBB8C; --good-tint:#152A20;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.4),0 20px 46px rgba(0,0,0,.5);
+  }}
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font:14px var(--sans);background:var(--ground);color:var(--ink)}
+  .wrap{font-family:var(--sans);color:var(--ink);background:var(--ground);background-image:var(--grad);
+    min-height:100vh;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;padding-bottom:60px}
+
+  header{position:sticky;top:0;z-index:8;background:color-mix(in srgb,var(--ground) 82%,transparent);
+    backdrop-filter:blur(12px) saturate(1.4);border-bottom:1px solid var(--line);padding:11px 24px}
+  .bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;max-width:1260px;margin:0 auto}
+  .mark{display:flex;align-items:center;gap:10px}
+  .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;letter-spacing:-.02em;box-shadow:var(--shadow)}
+  .mark b{font-size:15px;letter-spacing:.15em;color:var(--ink)} .mark span{font-size:11.5px;color:var(--ink-3);letter-spacing:.02em}
+  .tabs{display:flex;gap:3px;background:var(--line-2);padding:3px;border-radius:10px}
+  .tab{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-2);padding:6px 13px;border-radius:8px;cursor:pointer;transition:.15s}
+  .tab.on{background:var(--card);color:var(--accent-ink);box-shadow:var(--shadow)}
+  .tab:hover:not(.on){color:var(--ink)}
+  .bar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .sample{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--warn);
+    background:var(--warn-tint);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);padding:4px 9px;border-radius:6px}
+
+  /* people rail */
+  .rail{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--card) 55%,transparent);padding:9px 24px;overflow-x:auto}
+  .rail-in{display:flex;gap:8px;max-width:1260px;margin:0 auto;align-items:center}
+  .rail .rlbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:700;margin-right:4px;white-space:nowrap}
+  .chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:30px;
+    padding:4px 12px 4px 5px;cursor:pointer;white-space:nowrap;transition:.15s;flex:none}
+  .chip:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  .chip.on{border-color:var(--accent);background:var(--accent-tint)}
+  .chip .av{width:24px;height:24px;border-radius:50%;color:#fff;display:grid;place-items:center;font-size:10.5px;font-weight:700}
+  .chip .nm{font-size:12.5px;font-weight:600}
+  .chip .rl{font-size:11px;color:var(--ink-3)}
+
+  main{max-width:1260px;margin:0 auto;padding:22px 24px}
+  .view{animation:rise .28s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .note{font-size:12px;color:var(--ink-2);background:var(--card-2);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin-bottom:18px}
+  .note b{color:var(--ink)}
+  h2.sec{font-size:15px;margin:0 0 14px;font-weight:660;letter-spacing:-.01em}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .phead{display:flex;align-items:center;gap:10px;padding:14px 17px 12px}
+  .phead h3{font-size:14px;margin:0;font-weight:650}
+  .phead .cnt{font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--line-2);padding:2px 9px;border-radius:20px;margin-left:auto}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .dot.crit{background:var(--crit);box-shadow:0 0 0 4px var(--crit-tint)} .dot.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-tint)} .dot.good{background:var(--good);box-shadow:0 0 0 4px var(--good-tint)}
+  ul{list-style:none;margin:0;padding:0}
+  .pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;letter-spacing:.01em}
+  .pill.c{color:var(--crit);background:var(--crit-tint)} .pill.w{color:var(--warn);background:var(--warn-tint)} .pill.g{color:var(--good);background:var(--good-tint)} .pill.n{color:var(--accent-ink);background:var(--accent-tint)}
+  .oid{font-family:var(--mono);font-size:11.5px;color:var(--accent-ink);font-weight:600;white-space:nowrap;background:var(--accent-tint);padding:2px 7px;border-radius:6px}
+
+  /* closer id */
+  .idrow{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .avatar{width:46px;height:46px;border-radius:13px;color:#fff;display:grid;place-items:center;font-weight:700;font-size:16px;box-shadow:var(--shadow)}
+  .idrow h1{font-size:20px;margin:0;font-weight:680;letter-spacing:-.015em}
+  .idrow .role{font-size:12.5px;color:var(--ink-2);margin-top:1px}
+  .idrow .role b{color:var(--ink)}
+
+  .pipe{padding:17px 19px;margin-bottom:16px}
+  .pipe .top{display:flex;align-items:baseline;gap:10px;margin-bottom:13px}
+  .pipe .top h3{font-size:14px;margin:0;font-weight:650}
+  .pipe .top .tot{font-size:12.5px;color:var(--ink-2);margin-left:auto}
+  .pipe .top .tot b{color:var(--ink);font-size:16px}
+  .segbar{display:flex;height:9px;border-radius:20px;overflow:hidden;margin-bottom:14px;gap:2px;background:var(--line-2)}
+  .segbar i{display:block;height:100%;transition:width .4s ease}
+  .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  .stage{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:var(--card-2);transition:.15s;position:relative}
+  .stage:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line));transform:translateY(-1px)}
+  .stage.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:var(--accent-tint)}
+  .stage .sn{font-size:25px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .stage .sl{font-size:11.5px;color:var(--ink-2)}
+  .stage .swatch{width:22px;height:4px;border-radius:20px;margin-top:3px}
+
+  .cols{display:grid;grid-template-columns:1fr 1.18fr;gap:16px;align-items:start}
+  .hint{font-size:11px;color:var(--ink-3);padding:9px 17px}
+  li.file{display:flex;align-items:center;gap:12px;padding:12px 17px;border-top:1px solid var(--line-2);cursor:pointer;position:relative;transition:background .12s}
+  li.file:hover{background:var(--card-2)} li.file::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent}
+  li.file.c::before{background:var(--crit)} li.file.w::before{background:var(--warn)}
+  li.file.on{background:var(--accent-tint)} li.file.on:hover{background:var(--accent-tint)}
+  .fmeta{flex:1;min-width:0} .fmeta .t{font-size:13px;font-weight:560;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fmeta .s{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+  .badges{display:flex;gap:6px;white-space:nowrap}
+  .b{font-size:11px;font-weight:650;color:var(--ink-2);background:var(--line-2);padding:2px 8px;border-radius:20px}
+  .b.mail{color:var(--crit);background:var(--crit-tint)} .b.task{color:var(--accent-ink);background:var(--accent-tint)}
+
+  .dhead{padding:16px 19px;background:linear-gradient(180deg,var(--card-2),transparent)}
+  .dhead h3{font-size:17px;margin:6px 0 7px;font-weight:670;letter-spacing:-.01em}
+  .dhead .drow{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+  .dhead .drow b{color:var(--ink)}
+  .sub{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:13px 19px 7px;border-top:1px solid var(--line-2);display:flex;align-items:center}
+  .sub .c2{margin-left:auto;color:var(--ink-2);letter-spacing:0;text-transform:none;font-weight:600;font-size:11.5px}
+  .trow{display:flex;align-items:center;gap:11px;padding:9px 19px}
+  .trow .tt{flex:1;font-size:13px} .trow .tw{font-size:11.5px;color:var(--ink-2)}
+  .mail-row{display:flex;gap:12px;padding:12px 19px;border-top:1px solid var(--line-2);position:relative}
+  .mail-row.un{background:color-mix(in srgb,var(--crit-tint) 40%,transparent)}
+  .mail-row.un::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--crit)}
+  .mav{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
+  .mav.in{background:var(--crit)} .mav.out{background:var(--good)}
+  .mbody{flex:1;min-width:0} .mbody .mfrom{font-size:12.5px;font-weight:650}
+  .mbody .msub{font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .attach{display:inline-flex;gap:4px;font-size:11px;color:var(--accent-ink);background:var(--accent-tint);padding:1px 8px;border-radius:20px;margin-top:5px;font-family:var(--mono)}
+  .mright{text-align:right;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+  .mwhen{font-size:11px;color:var(--ink-3);white-space:nowrap}
+
+  /* tower */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+  .kpi{padding:15px 16px;position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;right:-20px;bottom:-20px;width:70px;height:70px;border-radius:50%;background:var(--accent-tint);opacity:.5}
+  .kpi.crit::after{background:var(--crit-tint)} .kpi.warn::after{background:var(--warn-tint)}
+  .kpi .n{font-size:27px;font-weight:700;letter-spacing:-.02em;line-height:1;position:relative}
+  .kpi .l{font-size:11.5px;color:var(--ink-2);margin-top:6px;position:relative}
+  .kpi.crit .n{color:var(--crit)} .kpi.warn .n{color:var(--warn)}
+  .roster{width:100%;border-collapse:collapse}
+  .roster th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);text-align:left;padding:11px 16px;border-bottom:1px solid var(--line);font-weight:700}
+  .roster th.r,.roster td.r{text-align:right}
+  .roster td{padding:12px 16px;border-bottom:1px solid var(--line-2);font-size:13px}
+  .roster tbody tr{cursor:pointer;transition:background .12s} .roster tbody tr:hover{background:var(--card-2)}
+  .roster tbody tr:last-child td{border-bottom:0}
+  .who2{display:flex;align-items:center;gap:11px}
+  .av2{width:32px;height:32px;border-radius:9px;color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+  .who2 .nm{font-weight:600} .who2 .rl{font-size:11px;color:var(--ink-3)}
+  .load{display:flex;align-items:center;gap:9px;min-width:160px}
+  .load .track{flex:1;height:8px;background:var(--line-2);border-radius:20px;overflow:hidden} .load .fill{height:100%;border-radius:20px;transition:width .4s}
+  .load .pct{font-size:11.5px;font-weight:700;width:40px;text-align:right}
+  .mini{display:flex;height:7px;width:96px;border-radius:20px;overflow:hidden;gap:1px;background:var(--line-2)} .mini i{height:100%}
+  .flag{font-size:12px;font-weight:700;color:var(--crit)}
+  .tinsight{margin:16px;padding:14px 17px;background:var(--accent-tint);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);border-radius:12px;font-size:13px;color:var(--accent-ink);display:flex;gap:10px;align-items:flex-start}
+  .tinsight .ic{font-size:15px} .tinsight b{color:var(--ink)}
+
+  /* capacity */
+  .cap-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:16px;align-items:start}
+  .scen{padding:16px} .scen .scbtn+.scbtn{margin-top:9px}
+  .scbtn{width:100%;text-align:left;border:1px solid var(--line);background:var(--card-2);border-radius:12px;padding:13px 15px;cursor:pointer;font:inherit;display:flex;align-items:center;gap:13px;transition:.15s}
+  .scbtn:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+  .scbtn.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);background:var(--accent-tint)}
+  .scbtn .fpc{font-size:23px;font-weight:720;color:var(--accent-ink);width:46px;flex:none}
+  .scbtn .txt .a{font-size:13px;font-weight:650} .scbtn .txt .b2{font-size:11.5px;color:var(--ink-2)}
+  .out{padding:20px}
+  .bignum{font-size:44px;font-weight:760;letter-spacing:-.025em;line-height:1;background:linear-gradient(90deg,var(--accent-ink),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .out .lab{font-size:12px;color:var(--ink-2);margin:6px 0 18px}
+  .row2{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:16px}
+  .row2 .m .n{font-size:21px;font-weight:700} .row2 .m .l{font-size:11px;color:var(--ink-2)}
+  .delta{font-size:13px;font-weight:700;color:var(--good);background:var(--good-tint);display:inline-block;padding:5px 11px;border-radius:8px}
+  .cmpbar .lbl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-2);margin:11px 0 4px} .cmpbar .lbl b{color:var(--ink)}
+  .cmpbar .tk{height:10px;background:var(--line-2);border-radius:20px;overflow:hidden} .cmpbar .fl{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:20px;transition:width .5s}
+  .assume{font-size:11px;color:var(--ink-3);margin-top:16px;line-height:1.6;border-top:1px solid var(--line-2);padding-top:12px}
+
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+  @media (max-width:880px){.cols,.cap-grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.stages{grid-template-columns:repeat(2,1fr)}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="bar">
+      <div class="mark"><div class="logo">A</div><b>ARES</b><span>Command</span></div>
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-view="closer">My Board</button>
+        <button class="tab" data-view="tower">Command Tower</button>
+        <button class="tab" data-view="capacity">Capacity Model</button>
+      </div>
+      <div class="right"><span class="sample">Prototype · sample data</span></div>
+    </div>
+  </header>
+  <div class="rail"><div class="rail-in" id="rail"></div></div>
+  <main id="app"></main>
+</div>
+
+<script>
+const STAGES=[["pending","Pending contract","#8A94A1"],["under","Under contract","#0E6E7D"],
+  ["scheduled","Scheduled to close","#17A2B4"],["funding","In funding","#2C7B58"]];
+const T=(t,st,w)=>({t,st,w});
+const M=(dir,from,sub,o={})=>({dir,from,sub,attach:o.a||null,un:!!o.un,when:o.when||""});
+const F=(id,type,city,stage,o={})=>({id,type,city,stage,close:o.close||"—",stalled:o.stalled||0,exc:!!o.exc,tasks:o.tasks||[],emails:o.emails||[]});
+const STAFF=[
+ {id:"nt",name:"Nicole Teague",role:"Escrow Officer",color:"#0E6E7D",target:100,stages:{pending:10,under:20,scheduled:10,funding:10},exc:2,unread:4,
+  files:[
+   F("0291","Purchase","Milford, CT","under",{close:"Jul 8",tasks:[T("Verify payoff figures (four-eyes)","c","1 day late"),T("Request updated payoff","n","due Jul 3"),T("Order title search","g","Jun 28")],
+     emails:[M("in","Homestead Mortgage — L. Reyes","Updated CD — please confirm figures",{a:"CD_v2.pdf",un:1,when:"3h ago"}),M("in","Coastline Realty — buyer’s agent","Is closing still on for Tuesday?",{un:1,when:"Yesterday"}),M("out","To: Seller","Wire instructions verification request",{when:"Jun 30"}),M("in","First County Bank — Payoff Dept","Payoff statement attached",{a:"Payoff_Statement.pdf",when:"Jun 29"})]}),
+   F("0318","Refi","Naugatuck, CT","under",{close:"Jul 11",tasks:[T("Clear title exceptions","w","due Jul 4")],emails:[M("in","Underwriter Desk","Requirement added to commitment",{un:1,when:"1h ago"})]}),
+   F("0265","Refi","Meriden, CT","under",{stalled:9,tasks:[T("Follow up: survey","w","aging"),T("Chase lender docs","w","aging")],emails:[M("out","To: Loan Officer","Status check — need docs",{when:"Jun 25"})]}),
+   F("0298","Purchase","Shelton, CT","scheduled",{close:"Jul 3",tasks:[T("Confirm signing time","n","due today")],emails:[M("in","Buyer","Confirmed for 10am",{when:"Jun 30"})]}),
+   F("0277","Purchase","Derby, CT","scheduled",{close:"Jul 6",exc:1,tasks:[T("Resolve unreleased prior lien","c","blocks CTC")],emails:[M("in","Title Examiner","Prior mortgage not released",{un:1,when:"2d ago"})]}),
+   F("0301","Refi","Orange, CT","funding",{close:"Funding",tasks:[T("Post disbursements","n","due Jul 3")],emails:[]})]},
+ {id:"mv",name:"Marcus Vale",role:"Closer",color:"#B5372B",target:100,stages:{pending:14,under:52,scheduled:30,funding:22},exc:6,unread:19,
+  files:[F("0410","Purchase","Trumbull, CT","under",{close:"Jul 9",tasks:[T("Balance file","w","due today")],emails:[M("in","Agent","Where are we?",{un:1,when:"4h ago"})]}),
+         F("0388","Purchase","Fairfield, CT","scheduled",{close:"Jul 3",exc:1,tasks:[T("Missing homeowner's insurance","c","blocks CTC")],emails:[M("in","Lender","HOI still outstanding",{un:1,when:"1d ago"})]}),
+         F("0356","Refi","Norwalk, CT","under",{stalled:12,tasks:[T("Chase payoff","w","aging")],emails:[]})]},
+ {id:"ps",name:"Priya Shah",role:"Processor",color:"#17A2B4",target:120,stages:{pending:22,under:26,scheduled:8,funding:4},exc:1,unread:5,
+  files:[F("0501","Purchase","Hamden, CT","pending",{tasks:[T("Open title search","n","due Jul 3")],emails:[]}),
+         F("0498","Refi","Bethel, CT","under",{tasks:[T("Type commitment","n","due Jul 5")],emails:[M("in","Abstractor","Search complete",{when:"Jun 30"})]})]},
+ {id:"dr",name:"Dana Roswell",role:"Escrow Officer",color:"#B0730F",target:100,stages:{pending:12,under:44,scheduled:28,funding:20},exc:4,unread:11,
+  files:[F("0333","Purchase","Guilford, CT","scheduled",{close:"Jul 7",exc:1,tasks:[T("Verify wire instructions","c","dual-control")],emails:[M("in","Seller","New bank for wire?",{un:1,when:"2h ago"})]}),
+         F("0329","Purchase","Madison, CT","under",{tasks:[T("Order payoff","n","due Jul 4")],emails:[]})]},
+ {id:"tb",name:"Tom Byrne",role:"Post-Closing",color:"#2C7B58",target:140,stages:{pending:0,under:0,scheduled:34,funding:36},exc:0,unread:2,
+  files:[F("0210","Purchase","Branford, CT","funding",{tasks:[T("Confirm recording","n","due Jul 3")],emails:[]}),
+         F("0198","Refi","Wallingford, CT","funding",{tasks:[T("Issue final policy","n","due Jul 4")],emails:[]})]}
+];
+STAFF.forEach(s=>{s.total=Object.values(s.stages).reduce((a,b)=>a+b,0);});
+const CAP={closers:5,rev:650,scen:[["today",20,"Today — email in Outlook","reps hunt inboxes; manual tasks"],["inbox",50,"Email-in-file","one timeline per file; no inbox hunting"],["auto",100,"+ Smart Action automation","controls & tasks auto-append"]]};
+
+let state={view:"closer",staffId:"nt",stage:null,fileId:"0291",scen:"inbox"};
+const money=n=>"$"+n.toLocaleString();
+const staff=id=>STAFF.find(s=>s.id===id);
+const initials=n=>n.split(" ").map(w=>w[0]).slice(0,2).join("");
+const stageName=k=>{const s=STAGES.find(x=>x[0]===k);return s?s[1]:"In process";};
+
+function segbar(st,total){return `<div class="segbar">`+STAGES.map(([k,,c])=>{const v=st[k]||0;return v?`<i style="width:${(v/total*100).toFixed(1)}%;background:${c}"></i>`:"";}).join("")+`</div>`;}
+
+function renderRail(){
+  $("rail").innerHTML=`<span class="rlbl">Team</span>`+STAFF.map(s=>`
+    <button class="chip ${state.view==='closer'&&state.staffId===s.id?'on':''}" data-staff="${s.id}">
+      <span class="av" style="background:${s.color}">${initials(s.name)}</span>
+      <span><span class="nm">${s.name.split(" ")[0]}</span></span></button>`).join("")
+    +`<span style="flex:1"></span><span class="rlbl" style="opacity:.7">+ one board per employee — add the roster</span>`;
+}
+
+function renderCloser(){
+  const s=staff(state.staffId);
+  const files=state.stage?s.files.filter(f=>f.stage===state.stage):s.files;
+  if(!files.find(f=>f.id===state.fileId)) state.fileId=(files[0]||s.files[0]).id;
+  const f=s.files.find(x=>x.id===state.fileId);
+  const stageCards=STAGES.map(([k,l,c])=>`<div class="stage ${state.stage===k?'on':''}" data-stage="${k}" tabindex="0" role="button">
+     <span class="sn">${s.stages[k]||0}</span><span class="sl">${l}</span><span class="swatch" style="background:${c}"></span></div>`).join("");
+  const queue=files.map(f2=>{const sev=f2.exc?'c':(f2.stalled?'w':'');const un=f2.emails.filter(e=>e.un).length;
+    return `<li class="file ${sev} ${f2.id===state.fileId?'on':''}" data-file="${f2.id}" tabindex="0" role="button">
+      <span class="oid">${f2.id}</span><div class="fmeta"><div class="t">${f2.type} · ${f2.city}</div>
+        <div class="s">${f2.stalled?('Stalled '+f2.stalled+' days'):(f2.close!=='—'?'Close '+f2.close:stageName(f2.stage))}</div></div>
+      <div class="badges">${f2.tasks.length?`<span class="b task">${f2.tasks.length} task${f2.tasks.length>1?'s':''}</span>`:''}${un?`<span class="b mail">${un} unread</span>`:''}</div></li>`;}).join("");
+  const tasks=f.tasks.map(t=>`<div class="trow"><span class="tt">${t.t}</span><span class="tw">${t.w}</span>
+     <span class="pill ${t.st}">${({c:'Overdue',w:'Aging',n:'Upcoming',g:'Done'})[t.st]}</span></div>`).join("")||`<div class="trow"><span class="tt" style="color:var(--ink-3)">No open tasks</span></div>`;
+  const unc=f.emails.filter(e=>e.un).length;
+  const emails=f.emails.map(e=>`<div class="mail-row ${e.un?'un':''}"><div class="mav ${e.dir}">${e.dir.toUpperCase()}</div>
+     <div class="mbody"><div class="mfrom">${e.from}</div><div class="msub">${e.sub}</div>${e.attach?`<span class="attach">📎 ${e.attach} · filed</span>`:''}</div>
+     <div class="mright"><span class="mwhen">${e.when}</span>${e.un?'<span class="pill c">Needs reply</span>':''}</div></div>`).join("")||`<div class="mail-row"><div class="mbody"><div class="msub" style="color:var(--ink-3)">No email on this file yet</div></div></div>`;
+  return `<div class="view">
+   <div class="idrow"><div class="avatar" style="background:${s.color}">${initials(s.name)}</div>
+     <div><h1>${s.name}</h1><div class="role"><b>${s.role}</b> · ${s.total} files assigned</div></div></div>
+   <section class="panel pipe"><div class="top"><h3>My pipeline</h3><span class="tot"><b>${s.total}</b> files</span></div>
+     ${segbar(s.stages,s.total)}<div class="stages">${stageCards}</div></section>
+   <div class="cols">
+     <section class="panel"><div class="phead"><span class="dot"></span><h3>${state.stage?stageName(state.stage):'All my files'}</h3><span class="cnt">${files.length}</span></div>
+       <div class="hint">${state.stage?'Filtered — click the stage again to clear. ':''}Click a file → its tasks &amp; emails →</div><ul>${queue}</ul></section>
+     <section class="panel"><div class="dhead"><span class="oid">ARES-26-${f.id}</span><h3>${f.type} · ${f.city}</h3>
+       <div class="drow"><span>Stage: <b>${stageName(f.stage)}</b></span><span>Close: <b>${f.close}</b></span>${f.exc?'<span style="color:var(--crit);font-weight:700">⚠ Exception</span>':''}</div></div>
+       <div class="sub">Tasks — this file <span class="c2">${f.tasks.length}</span></div>${tasks}
+       <div class="sub">Emails — this file <span class="c2">${unc} unanswered</span></div>${emails}</section>
+   </div></div>`;
+}
+
+function renderTower(){
+  const tot=STAFF.reduce((a,s)=>a+s.total,0), exc=STAFF.reduce((a,s)=>a+s.exc,0), unread=STAFF.reduce((a,s)=>a+s.unread,0);
+  const stg={};STAGES.forEach(([k])=>stg[k]=STAFF.reduce((a,s)=>a+(s.stages[k]||0),0));
+  const closing=stg.scheduled+stg.funding;
+  const rows=STAFF.map(s=>{const load=Math.round(s.total/s.target*100);const col=load>=110?'var(--crit)':load>=90?'var(--warn)':'var(--good)';
+    const mini=STAGES.map(([k,,c])=>{const v=s.stages[k]||0;return v?`<i style="width:${v/s.total*100}%;background:${c}"></i>`:'';}).join("");
+    return `<tr data-staff="${s.id}"><td><div class="who2"><div class="av2" style="background:${s.color}">${initials(s.name)}</div>
+        <div><div class="nm">${s.name}</div><div class="rl">${s.role}</div></div></div></td>
+      <td class="r"><b>${s.total}</b></td>
+      <td><div class="load"><div class="track"><div class="fill" style="width:${Math.min(load,100)}%;background:${col}"></div></div><span class="pct" style="color:${col}">${load}%</span></div></td>
+      <td><div class="mini">${mini}</div></td>
+      <td class="r">${s.exc?`<span class="flag">${s.exc}</span>`:'0'}</td>
+      <td class="r">${s.unread?`<span class="flag">${s.unread}</span>`:'0'}</td></tr>`;}).join("");
+  const over=STAFF.filter(s=>s.total/s.target>=1.1).map(s=>s.name.split(" ")[0]);
+  const under=STAFF.filter(s=>s.total/s.target<=0.6).map(s=>s.name.split(" ")[0]);
+  const insight=over.length&&under.length?`<b>Load imbalance detected.</b> ${over.join(", ")} ${over.length>1?'are':'is'} over capacity while ${under.join(", ")} ${under.length>1?'have':'has'} room. Shifting ~15–20 files evens the team and pulls exception risk off the overloaded desk.`:`Team load is balanced.`;
+  return `<div class="view"><h2 class="sec">Command Tower — the whole team, live, without a single CC</h2>
+   <div class="kpis">
+     <div class="panel kpi"><div class="n">${tot}</div><div class="l">Files in production</div></div>
+     <div class="panel kpi"><div class="n">${closing}</div><div class="l">Closing / funding</div></div>
+     <div class="panel kpi warn"><div class="n">${stg.pending}</div><div class="l">Pending contract</div></div>
+     <div class="panel kpi crit"><div class="n">${exc}</div><div class="l">Open exceptions</div></div>
+     <div class="panel kpi crit"><div class="n">${unread}</div><div class="l">Unanswered emails</div></div></div>
+   <section class="panel"><table class="roster"><thead><tr><th>Team member</th><th class="r">Files</th><th>Load vs capacity</th><th>Pipeline mix</th><th class="r">Exc.</th><th class="r">Unread</th></tr></thead><tbody>${rows}</tbody></table>
+     <div class="tinsight"><span class="ic">⚖️</span><span>${insight}</span></div></section>
+   <p class="hint">Click any team member to open their board. Everything above is visible to management without being copied on one email.</p></div>`;
+}
+
+function renderCapacity(){
+  const sc=CAP.scen.find(x=>x[0]===state.scen), base=CAP.scen[0][1], fpc=sc[1], closers=CAP.closers;
+  const orgMo=fpc*closers, rev=orgMo*CAP.rev, baseRev=base*closers*CAP.rev, deltaRev=rev-baseRev, mult=fpc/base;
+  const btns=CAP.scen.map(x=>`<button class="scbtn ${state.scen===x[0]?'on':''}" data-scen="${x[0]}"><span class="fpc">${x[1]}</span><span class="txt"><span class="a">${x[2]}</span><span class="b2">${x[3]}</span></span></button>`).join("");
+  const maxRev=CAP.scen[2][1]*closers*CAP.rev;
+  const cmp=CAP.scen.map(x=>{const r=x[1]*closers*CAP.rev;return `<div class="lbl"><span>${x[2].split('—')[0].trim()}</span><span><b>${money(r)}</b>/mo</span></div><div class="tk"><div class="fl" style="width:${r/maxRev*100}%"></div></div>`;}).join("");
+  return `<div class="view"><h2 class="sec">Capacity Model — the "20 vs 100 files" thesis, in dollars</h2>
+   <div class="note"><b>Illustrative model.</b> The jump isn't working harder — it's removing inbox-hunting (email-in-file) and manual steps (Smart Actions). Numbers are assumptions to calibrate to your actuals, not measured facts.</div>
+   <div class="cap-grid">
+     <section class="panel scen"><div class="phead" style="padding:2px 2px 8px"><h3>Scenario</h3></div>${btns}
+       <div class="assume">Assumptions: <b>${closers} closers</b> · <b>${money(CAP.rev)}</b> revenue per closed file — both editable to your reality. Files/closer/month reflect your own 20→100 observation.</div></section>
+     <section class="panel out"><div class="bignum">${money(rev)}</div><div class="lab">Monthly revenue capacity (${closers} closers × ${fpc} files × ${money(CAP.rev)})</div>
+       <div class="row2"><div class="m"><div class="n">${fpc}</div><div class="l">Files / closer / mo</div></div><div class="m"><div class="n">${orgMo}</div><div class="l">Org closings / mo</div></div><div class="m"><div class="n">${mult.toFixed(1)}×</div><div class="l">vs. today</div></div></div>
+       ${deltaRev>0?`<div class="delta">+${money(deltaRev)}/mo · +${money(deltaRev*12)}/yr capacity unlocked vs. today</div>`:`<div class="lab">Baseline scenario.</div>`}
+       <div class="cmpbar" style="margin-top:16px">${cmp}</div></section></div>
+   <p class="hint">The bridge from ops tooling to the turnaround P&amp;L: dashboards + email-in-file + automation are what move a closer from ${base} to ${CAP.scen[2][1]} files — capacity you win without adding headcount.</p></div>`;
+}
+
+const $=id=>document.getElementById(id);
+function render(){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.view===state.view));
+  renderRail();
+  $("app").innerHTML = state.view==="closer"?renderCloser():state.view==="tower"?renderTower():renderCapacity();
+}
+function act(el){
+  if(el.dataset.view){state.view=el.dataset.view;}
+  else if(el.dataset.stage!==undefined&&el.dataset.stage){state.stage=state.stage===el.dataset.stage?null:el.dataset.stage;}
+  else if(el.dataset.file){state.fileId=el.dataset.file;}
+  else if(el.dataset.staff){state.staffId=el.dataset.staff;state.stage=null;state.view="closer";}
+  else if(el.dataset.scen){state.scen=el.dataset.scen;}
+  else return false;
+  render();return true;
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-view],[data-stage],[data-file],[data-staff],[data-scen]');if(el)act(el);});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const el=e.target.closest('[data-stage],[data-file],[data-staff],[data-scen]');if(el){e.preventDefault();act(el);}}});
+render();
+</script>
+
+</body>
+</html>

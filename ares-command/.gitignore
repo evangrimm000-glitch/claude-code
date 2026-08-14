@@ -1,0 +1,5 @@
+# Real data must NEVER be committed. The prototype reads window.ARES_DATA from a
+# local override file kept out of version control (see docs/reporting/README.md).
+data.local.js
+data.local.json
+*.local.js

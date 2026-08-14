@@ -204,13 +204,18 @@
   <main id="app"></main>
 </div>
 
+<!-- Optional local data override. Drop a git-ignored data.local.js next to this
+     file that sets window.ARES_DATA = {STAGES,STAFF,CAP} to run on real numbers.
+     NEVER commit real roster/revenue/customer data — see docs/reporting/README.md. -->
+<script src="data.local.js" onerror="void 0"></script>
 <script>
-const STAGES=[["pending","Pending contract","#8A94A1"],["under","Under contract","#0E6E7D"],
+const _D = (typeof window!=="undefined" && window.ARES_DATA) || {};
+const STAGES=_D.STAGES||[["pending","Pending contract","#8A94A1"],["under","Under contract","#0E6E7D"],
   ["scheduled","Scheduled to close","#17A2B4"],["funding","In funding","#2C7B58"]];
 const T=(t,st,w)=>({t,st,w});
 const M=(dir,from,sub,o={})=>({dir,from,sub,attach:o.a||null,un:!!o.un,when:o.when||""});
 const F=(id,type,city,stage,o={})=>({id,type,city,stage,close:o.close||"—",stalled:o.stalled||0,exc:!!o.exc,tasks:o.tasks||[],emails:o.emails||[]});
-const STAFF=[
+const STAFF=_D.STAFF||[
  {id:"nt",name:"Nicole Teague",role:"Escrow Officer",color:"#0E6E7D",target:100,stages:{pending:10,under:20,scheduled:10,funding:10},exc:2,unread:4,
   files:[
    F("0291","Purchase","Milford, CT","under",{close:"Jul 8",tasks:[T("Verify payoff figures (four-eyes)","c","1 day late"),T("Request updated payoff","n","due Jul 3"),T("Order title search","g","Jun 28")],
@@ -235,7 +240,7 @@ const STAFF=[
          F("0198","Refi","Wallingford, CT","funding",{tasks:[T("Issue final policy","n","due Jul 4")],emails:[]})]}
 ];
 STAFF.forEach(s=>{s.total=Object.values(s.stages).reduce((a,b)=>a+b,0);});
-const CAP={closers:5,rev:650,scen:[["today",20,"Today — email in Outlook","reps hunt inboxes; manual tasks"],["inbox",50,"Email-in-file","one timeline per file; no inbox hunting"],["auto",100,"+ Smart Action automation","controls & tasks auto-append"]]};
+const CAP=_D.CAP||{closers:5,rev:650,scen:[["today",20,"Today — email in Outlook","reps hunt inboxes; manual tasks"],["inbox",50,"Email-in-file","one timeline per file; no inbox hunting"],["auto",100,"+ Smart Action automation","controls & tasks auto-append"]]};
 
 let state={view:"closer",staffId:"nt",stage:null,fileId:"0291",scen:"inbox"};
 const money=n=>"$"+n.toLocaleString();

@@ -1,0 +1,56 @@
+<!--page
+{"out": "order/index.html", "path": "/order/", "title": "Start an order | Banyan Tree Title", "description": "Open a title order with Banyan Tree Title. Tell us about the property and the deal. We open the file the same business day."}
+-->
+{{> head}}
+{{> header}}
+<main id="main">
+<section class="page-head">
+  <div class="wrap narrow">
+    <p class="eyebrow">Start an order</p>
+    <h1>Tell us about the deal.</h1>
+    <p class="lede">We open the file the same business day and call you with your closer's name. Prefer to talk? <a href="{{phone_href}}">{{phone}}</a>.</p>
+  </div>
+</section>
+<section class="section section-tight">
+  <div class="wrap narrow">
+    <form class="form" name="order" method="POST" action="/thanks/" data-netlify="true" netlify-honeypot="company-site">
+      <input type="hidden" name="form-name" value="order">
+      <p class="hp"><label>Leave this empty <input name="company-site" tabindex="-1" autocomplete="off"></label></p>
+
+      <fieldset>
+        <legend>You</legend>
+        <div class="grid2">
+          <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="f-role">I am the</label>
+            <select id="f-role" name="role" required>
+              <option value="">Choose one</option>
+              <option>Buyer</option><option>Seller</option><option>Real estate agent</option><option>Lender</option><option>Investor or wholesaler</option><option>Asset manager</option><option>Builder</option><option>Attorney</option><option>Other</option>
+            </select></div>
+          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>The property</legend>
+        <div class="field"><label for="f-addr">Property address</label><input id="f-addr" name="property_address" autocomplete="off" required></div>
+        <div class="grid2">
+          <div class="field"><label for="f-county">County</label><input id="f-county" name="county" autocomplete="off"></div>
+          <div class="field"><label for="f-type">Transaction</label>
+            <select id="f-type" name="transaction" required>
+              <option value="">Choose one</option>
+              <option>Purchase with a loan</option><option>Cash purchase</option><option>Refinance</option><option>Bank-owned sale</option><option>Assignment or double closing</option><option>Auction purchase</option><option>1031 exchange</option><option>New construction</option><option>Other</option>
+            </select></div>
+          <div class="field"><label for="f-price">Sale price <span class="opt">if known</span></label><input id="f-price" name="sale_price" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><label for="f-date">Target closing date <span class="opt">if known</span></label><input id="f-date" name="closing_date" type="date"></div>
+        </div>
+        <div class="field"><label for="f-notes">Anything we should know <span class="opt">optional</span></label><textarea id="f-notes" name="notes" rows="4"></textarea></div>
+      </fieldset>
+
+      <p class="form-warn"><strong>Do not put bank account, wire, or Social Security numbers in this form.</strong> We collect those by phone or through a secure link after the file is open.</p>
+      <button class="btn btn-lg" type="submit">Send the order</button>
+    </form>
+  </div>
+</section>
+</main>
+{{> footer}}

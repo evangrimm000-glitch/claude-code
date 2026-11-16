@@ -1,0 +1,30 @@
+{
+  "_readme": "Single source of facts for the site. Leave a value null until it is confirmed. The build marks every null on the page and the production build refuses to ship with any required fact missing.",
+
+  "name": "Banyan Tree Title",
+  "legal_name": "Banyan Tree Title, LLC",
+  "domain": "banyantreetitle.com",
+  "city": "St. Petersburg",
+  "state": "Florida",
+  "year": "2026",
+
+  "required": {
+    "phone": null,
+    "email": null,
+    "address": null,
+    "license": null,
+    "underwriter": null
+  },
+
+  "optional": {
+    "closing_fee": null,
+    "order_portal_url": null
+  },
+
+  "principal": {
+    "name": "Evan Grimm",
+    "years_in_title": "25",
+    "states": "40",
+    "reo_closings_2019": "4,500"
+  }
+}

@@ -9,7 +9,7 @@ Static site for Banyan Tree Title. No framework, no dependencies, fonts self-hos
 
 ## Before launch
 
-Every business fact lives in `site.json`. Anything still `null` shows on the page as a yellow tag, and the production build (`node build.mjs --strict`) refuses to ship until all five are filled.
+Every business fact lives in `site.json`. Anything still `null` shows on the page as a yellow tag, and the build refuses to ship to banyantreetitle.com until all five are filled. On the netlify.app address it builds a marked, noindex preview.
 
 1. `phone`
 2. `email`

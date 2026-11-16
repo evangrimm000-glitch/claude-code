@@ -3,9 +3,8 @@
   command = "node build.mjs"
   publish = "dist"
 
-# Production refuses to ship while any required fact in site.json is still null.
-[context.production]
-  command = "node build.mjs --strict"
+# build.mjs refuses to build for the real domain while any required fact in
+# site.json is still null. On the netlify.app address it builds a marked preview.
 
 [[headers]]
   for = "/*"

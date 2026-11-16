@@ -1,13 +1,15 @@
 // Static build for banyantreetitle.com. No dependencies.
 //   node build.mjs            preview build, missing facts are marked on the page
-//   node build.mjs --strict   production build, fails if a required fact is missing
+//   node build.mjs --strict   launch build, fails if a required fact is missing
+// On Netlify the launch build turns on by itself once the real domain is the primary URL.
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const strict = process.argv.includes("--strict");
 const site = JSON.parse(readFileSync(join(root, "site.json"), "utf8"));
+// Strict when asked, and always when Netlify is building for the real domain.
+const strict = process.argv.includes("--strict") || (process.env.URL || "").includes(site.domain);
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const todo = (label) => `<span class="todo" title="Not confirmed yet. Set it in site.json.">[${label}]</span>`;
@@ -42,6 +44,7 @@ const tokens = {
   years: esc(site.principal.years_in_title),
   states: esc(site.principal.states),
   reo: esc(site.principal.reo_closings_2019),
+  robots_meta: missing.length ? '<meta name="robots" content="noindex, nofollow">' : "",
   preview_banner: missing.length
     ? `<div class="preview-banner" role="note">Preview build. ${missing.length} fact${missing.length > 1 ? "s" : ""} still to confirm before launch: ${missing.join(", ")}.</div>`
     : "",
@@ -81,7 +84,11 @@ for (const f of pages) {
   if (page.sitemap !== false) urls.push(page.path);
 }
 
-writeFileSync(join(dist, "robots.txt"), `User-agent: *\nAllow: /\nSitemap: https://${site.domain}/sitemap.xml\n`);
+// Preview builds stay out of search engines until every fact is confirmed.
+writeFileSync(
+  join(dist, "robots.txt"),
+  missing.length ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\nSitemap: https://${site.domain}/sitemap.xml\n`
+);
 writeFileSync(
   join(dist, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls

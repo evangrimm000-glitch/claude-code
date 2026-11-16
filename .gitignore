@@ -1,12 +1,10 @@
 .DS_Store
 
 
-# Build tooling and scratch for document generation (not part of the deliverable)
 node_modules/
 /package.json
 /package-lock.json
 /scratchpad/
-outputs/*.pdf
 
 # Banyan Tree Title site build output
 banyan-tree-site/dist/

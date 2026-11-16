@@ -1,0 +1,218 @@
+<!--page
+{"out": "index.html", "path": "/", "title": "Banyan Tree Title | Florida title insurance and closings, St. Petersburg", "description": "Banyan Tree Title is a licensed Florida title agency in St. Petersburg. Title insurance and closings for homes, investment property, and bank-owned real estate anywhere in Florida."}
+-->
+{{> head}}
+{{> header}}
+<main id="main">
+
+<section class="hero">
+  <div class="hero-art" aria-hidden="true">{{> mark}}</div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Licensed Florida title agency</p>
+      <h1>Clear title.<br>Clean closings.<span>Rooted in St.&nbsp;Petersburg. Closing anywhere in Florida.</span></h1>
+      <p class="lede">Title insurance and closings for homes, investment property, and bank-owned real estate anywhere in Florida. One closer on your file from contract to keys.</p>
+      <div class="actions">
+        <a class="btn btn-lg btn-accent" href="{{order_href}}">Start an order</a>
+        <a class="btn btn-lg btn-line" href="{{phone_href}}">Call {{phone}}</a>
+      </div>
+    </div>
+
+    <form class="calc" id="calc" novalidate aria-labelledby="calc-title">
+      <p class="calc-tag">Closing cost calculator</p>
+      <h2 id="calc-title">Estimate your title costs</h2>
+      <div class="calc-fields">
+        <div class="field">
+          <label for="price">Purchase price</label>
+          <div class="money"><span aria-hidden="true">$</span><input id="price" name="price" inputmode="numeric" autocomplete="off" value="400,000"></div>
+        </div>
+        <div class="field">
+          <label for="loan">Loan amount <span class="opt">blank for cash</span></label>
+          <div class="money"><span aria-hidden="true">$</span><input id="loan" name="loan" inputmode="numeric" autocomplete="off" value="320,000"></div>
+        </div>
+      </div>
+      <dl class="calc-out" aria-live="polite">
+        <div><dt>Owner's title policy</dt><dd id="o-owner">$0</dd></div>
+        <div><dt>Lender's title policy</dt><dd id="o-lender">$0</dd></div>
+        <div><dt>State tax on the deed</dt><dd id="o-deed">$0</dd></div>
+        <div><dt>State taxes on the mortgage</dt><dd id="o-mtg">$0</dd></div>
+        <div class="total"><dt>Estimated total</dt><dd id="o-total">$0</dd></div>
+      </dl>
+      <p class="calc-fine">An estimate, not a quote. Excludes the closing fee, recording, and lender charges. Who pays each line depends on your contract. <a href="#fees">How the rates work</a></p>
+    </form>
+  </div>
+  <div class="wrap">
+    <ul class="trust">
+      <li><strong>Licensed in Florida</strong><span>License {{license}}</span></li>
+      <li><strong>Underwritten by</strong><span>{{underwriter}}</span></li>
+      <li><strong>Operating standard</strong><span>ALTA Best Practices</span></li>
+      <li><strong>Office</strong><span>{{city}}, {{state}}</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="serve">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Who we serve</p>
+      <h2 class="h2">Six kinds of client. One standard of file.</h2>
+    </div>
+    <div class="cards">
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg></span>
+        <h3>Buyers and sellers</h3>
+        <p>We search the title, clear what needs clearing, hold the money, and close on the date in your contract. You get one closer and a direct line.</p>
+      </article>
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4"/><path d="M11 12.5 20 3.5"/><path d="M15.5 8l2.5 2.5"/><path d="M18 5.5 20 7.5"/></svg></span>
+        <h3>Real estate agents</h3>
+        <p>Open an order in a minute. We chase the estoppel, the payoff, and the survey, and we tell you where the file stands before you have to ask.</p>
+      </article>
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M7.5 15l4-4 3 3 5-6"/><path d="M16 8h3.5v3.5"/></svg></span>
+        <h3>Investors and wholesalers</h3>
+        <p>Assignments, double closings, auction purchases, 1031 exchanges. Tell us the structure up front and we paper it correctly.</p>
+      </article>
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5"/><path d="M4.5 9.5h15"/><path d="M6.5 12.5v5M10.5 12.5v5M13.5 12.5v5M17.5 12.5v5"/><path d="M4 20.5h16"/></svg></span>
+        <h3>Lenders</h3>
+        <p>Clean commitments, accurate figures, and a closer who answers the phone. Your package goes back complete.</p>
+      </article>
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2"/><path d="M10.5 20.5v-4h3v4"/></svg></span>
+        <h3>Banks and asset managers</h3>
+        <p>Bank-owned property is where we come from. Curative work, vacant property problems, and volume without dropped files.</p>
+      </article>
+      <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 20.5h18"/><path d="M5 20.5V11l5-3.5v13"/><path d="M10 20.5v-15l9 3v12"/><path d="M13.5 11h2M13.5 14.5h2"/></svg></span>
+        <h3>Builders and developers</h3>
+        <p>From the lot purchase through the last sale in the community. One standard closing package, every time.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section section-dark" id="proof">
+  <div class="wrap proof-grid">
+    <div>
+      <p class="eyebrow">Who is behind your file</p>
+      <h2 class="h2">Led by someone who has closed thousands of them.</h2>
+      <p>{{principal}} runs Banyan Tree Title. He has spent {{years}} years in title, built and ran a national title agency that operated in {{states}} states, and led the team that closed more than {{reo}} bank-owned transactions in 2019 alone.</p>
+      <p>That is the experience behind a local office. The hard files, the short deadlines, and the ones other agencies send back.</p>
+    </div>
+    <ul class="stats">
+      <li><strong>{{years}}</strong><span>years in title</span></li>
+      <li><strong>{{states}}</strong><span>states operated in</span></li>
+      <li><strong>{{reo}}+</strong><span>bank-owned closings in one year</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section section-gray" id="fees">
+  <div class="wrap fees-grid">
+    <div>
+      <p class="eyebrow">Fees</p>
+      <h2 class="h2">The premium is set by the state. The service is not.</h2>
+      <p>Florida sets the price of title insurance by rule. Every agency charges the same premium for the same policy. What you are choosing is who does the work.</p>
+      <p>When you buy with a loan, the lender's policy issued alongside your owner's policy costs $25 for coverage up to the purchase price.</p>
+      <p>Our closing fee is quoted with your order, in writing, before you commit.</p>
+      <p><a class="btn" href="#calc">Run your numbers</a></p>
+    </div>
+    <div class="rates">
+      <table>
+        <caption>Florida owner's title insurance rates</caption>
+        <thead><tr><th scope="col">Portion of the price</th><th scope="col">Rate per $1,000</th></tr></thead>
+        <tbody>
+          <tr><td>Up to $100,000</td><td>$5.75</td></tr>
+          <tr><td>$100,000 to $1 million</td><td>$5.00</td></tr>
+          <tr><td>$1 million to $5 million</td><td>$2.50</td></tr>
+          <tr><td>$5 million to $10 million</td><td>$2.25</td></tr>
+          <tr><td>Over $10 million</td><td>$2.00</td></tr>
+        </tbody>
+      </table>
+      <p class="fine">Rates set by Florida Administrative Code 69O-186.003. You may qualify for a lower reissue rate if the property was insured in the last three years. Ask us.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="start">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How to start</p>
+      <h2 class="h2">Three steps. The first one takes a minute.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Send us the deal</h3><p>Fill out the order form or email the contract. We open the file the same business day and tell you who your closer is.</p></li>
+      <li><h3>We search and clear</h3><p>We examine the title, order payoffs and estoppels, and fix what turns up. You get the commitment and a list of anything we need from you.</p></li>
+      <li><h3>You close</h3><p>At our office in {{city}}, or by mail if you are out of town. Funds go out, documents get recorded, and your policy follows.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section-green" id="wire">
+  <div class="wrap wire">
+    <div><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.600-3.100 8.100-7.5 9.5-4.400-1.400-7.5-4.900-7.5-9.5V6z"/><path d="M8.800 12.200l2.300 2.300 4.200-4.600"/></svg></span>
+      <p class="eyebrow">Wire fraud policy</p>
+      <h2 class="h2">We never change wire instructions by email.</h2>
+      <p>Criminals watch real estate deals and send fake wire instructions that look like ours. So we keep one rule and we do not bend it.</p>
+    </div>
+    <div class="wire-rules">
+      <ul class="ticks">
+        <li>Before you send any wire, call us at <a href="{{phone_href}}">{{phone}}</a>. Use the number on this site, not one from an email.</li>
+        <li>If you get an email changing our wire instructions, it is not from us. Call us.</li>
+        <li>Before we send money out, a person here confirms the instructions by phone.</li>
+      </ul>
+      <a class="btn btn-line" href="/wire-safety/">Read the full wire policy</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray" id="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <p class="eyebrow">Questions</p>
+      <h2 class="h2">What people ask us.</h2>
+      <p>Not here? Call <a href="{{phone_href}}">{{phone}}</a>.</p>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>What does a title company actually do?</summary>
+        <p>We check the public record to make sure the seller can sell and nothing is attached to the property that should not be. We fix what we find, hold the money, run the closing, record the deed, and issue the insurance policy that protects your ownership.</p>
+      </details>
+      <details>
+        <summary>How much does title insurance cost in Florida?</summary>
+        <p>The state sets the rate. On a $400,000 purchase the owner's policy is $2,075. You pay it once, at closing, and it covers you for as long as you own the property. Use the <a href="#calc">calculator</a> for your number.</p>
+      </details>
+      <details>
+        <summary>Who picks the title company?</summary>
+        <p>Your contract decides. In most of Tampa Bay the seller pays for the owner's policy and picks the agency. In some Florida counties the buyer does. Either way, you or your agent can ask for us by name.</p>
+      </details>
+      <details>
+        <summary>How long does a closing take?</summary>
+        <p>A cash purchase with clean title can close in about a week. A purchase with a loan usually runs on the lender's clock, 30 to 45 days.</p>
+      </details>
+      <details>
+        <summary>Can I close if I am not in Florida?</summary>
+        <p>Yes. We send you the documents with instructions. You sign in front of a notary where you are and send them back.</p>
+      </details>
+      <details>
+        <summary>Do you handle assignments and double closings?</summary>
+        <p>Yes. Tell us the structure when you open the order so the file is set up correctly from day one.</p>
+      </details>
+      <details>
+        <summary>How do I know wire instructions are really from you?</summary>
+        <p>Call us at {{phone}} before you send anything. We never change wire instructions by email. <a href="/wire-safety/">Our wire policy is here.</a></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap cta-inner">
+    <div>
+      <h2>Have a contract? Open the file today.</h2>
+      <p>Send it over and you will know who your closer is the same business day.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-lg btn-accent" href="{{order_href}}">Start an order</a>
+      <a class="btn btn-lg btn-line" href="{{email_href}}">Email the contract</a>
+    </div>
+  </div>
+</section>
+
+</main>
+{{> footer}}
